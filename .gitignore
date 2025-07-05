@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+uploads/
+*.sqlite3
+attendance.db
+
