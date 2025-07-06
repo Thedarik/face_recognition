@@ -312,38 +312,36 @@ async def get_all_group_files():
 
 
 # ❌ Barcha studentlarni va ularning ma'lumotlarini tozalovchi API
-@app.delete("/students/clear_all")
-async def clear_all_students():
+# 🧹 To'liq tizimni tozalovchi API
+@app.delete("/clear_all_data")
+async def clear_all_data():
     conn = sqlite3.connect("attendance.db")
     cursor = conn.cursor()
 
-    # Barcha rasmlarini o‘chirish
-    for filename in os.listdir(UPLOAD_DIR):
-        if filename.lower().endswith(('.png', '.jpg', '.jpeg')):
-            file_path = os.path.join(UPLOAD_DIR, filename)
-            os.remove(file_path)
-
-    # Attendance jadvalidan o‘chirish
+    # Barcha yo'qlama yozuvlarini o'chirish
     cursor.execute("DELETE FROM attendance")
 
-    # Students jadvalidan o‘chirish
+    # Barcha studentlarni o'chirish
     cursor.execute("DELETE FROM students")
+
+    # Barcha guruhlarni o'chirish
+    cursor.execute("DELETE FROM groups")
     conn.commit()
 
-    # Guruh JSON fayllaridan studentlarni o‘chirish
+    # uploads/ ichidagi barcha fayllarni o'chirish
+    for filename in os.listdir(UPLOAD_DIR):
+        file_path = os.path.join(UPLOAD_DIR, filename)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+
+    # groups_json/ ichidagi barcha JSON fayllarni o'chirish
     for filename in os.listdir(GROUPS_JSON):
         if filename.endswith(".json"):
-            group_path = os.path.join(GROUPS_JSON, filename)
-            try:
-                with open(group_path, "r+", encoding="utf-8") as f:
-                    data = json.load(f)
-                    data["students"] = []
-                    f.seek(0)
-                    json.dump(data, f, ensure_ascii=False, indent=4)
-                    f.truncate()
-            except:
-                continue
+            file_path = os.path.join(GROUPS_JSON, filename)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
 
     conn.close()
 
-    return {"message": "Barcha studentlar, rasmlar va yo‘qlama ma'lumotlari tozalandi."}
+    return {"message": "Tizim tozalandi: barcha studentlar, guruhlar, rasmlar, yo‘qlamalar va JSON fayllar o‘chirildi."}
+
