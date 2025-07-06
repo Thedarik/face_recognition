@@ -1,0 +1,12 @@
+{
+    "group_id": "m1",
+    "group_name": "m1",
+    "students": [
+        {
+            "first_name": "Samandar",
+            "last_name": "Eshpulatov",
+            "student_id": "001",
+            "photo_path": "uploads/001.png"
+        }
+    ]
+}
