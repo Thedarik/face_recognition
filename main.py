@@ -308,3 +308,42 @@ async def get_all_group_files():
             except:
                 continue
     return result
+
+
+
+# ❌ Barcha studentlarni va ularning ma'lumotlarini tozalovchi API
+@app.delete("/students/clear_all")
+async def clear_all_students():
+    conn = sqlite3.connect("attendance.db")
+    cursor = conn.cursor()
+
+    # Barcha rasmlarini o‘chirish
+    for filename in os.listdir(UPLOAD_DIR):
+        if filename.lower().endswith(('.png', '.jpg', '.jpeg')):
+            file_path = os.path.join(UPLOAD_DIR, filename)
+            os.remove(file_path)
+
+    # Attendance jadvalidan o‘chirish
+    cursor.execute("DELETE FROM attendance")
+
+    # Students jadvalidan o‘chirish
+    cursor.execute("DELETE FROM students")
+    conn.commit()
+
+    # Guruh JSON fayllaridan studentlarni o‘chirish
+    for filename in os.listdir(GROUPS_JSON):
+        if filename.endswith(".json"):
+            group_path = os.path.join(GROUPS_JSON, filename)
+            try:
+                with open(group_path, "r+", encoding="utf-8") as f:
+                    data = json.load(f)
+                    data["students"] = []
+                    f.seek(0)
+                    json.dump(data, f, ensure_ascii=False, indent=4)
+                    f.truncate()
+            except:
+                continue
+
+    conn.close()
+
+    return {"message": "Barcha studentlar, rasmlar va yo‘qlama ma'lumotlari tozalandi."}
