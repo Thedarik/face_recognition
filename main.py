@@ -1,4 +1,5 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException, Form
+from fastapi.middleware.cors import CORSMiddleware  # ✅ CORS import qilingan
 import sqlite3
 import os
 from datetime import datetime
@@ -9,11 +10,21 @@ import json
 
 app = FastAPI()
 
+# ✅ CORS middleware — frontend yoki Flutter ilova uchun muhim
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Ishlab chiqarishda ["https://eduflix.uz"] deb o‘zgartiring
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # 📂 Fayllar uchun papkalar
 UPLOAD_DIR = "uploads"
 GROUPS_JSON = "groups_json"
 Path(UPLOAD_DIR).mkdir(exist_ok=True)
 Path(GROUPS_JSON).mkdir(exist_ok=True)
+
 
 # 🛠️ Baza yaratish
 def init_db():
